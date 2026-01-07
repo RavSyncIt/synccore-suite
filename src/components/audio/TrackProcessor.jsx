@@ -1,8 +1,4 @@
-
-import { User } from "@/entities/User";
-import { Tag } from "@/entities/Tag";
-import { AudioTrack } from "@/entities/AudioTrack";
-import { InvokeLLM } from "@/integrations/Core";
+import { base44 } from "@/api/base44Client";
 
 class TrackProcessor {
     constructor() {
@@ -14,7 +10,7 @@ class TrackProcessor {
     }
 
     async getCyaniteToken() {
-        const user = await User.me();
+        const user = await base44.auth.me();
         if (!user?.cyaniteToken) {
             throw new Error("API token not configured. Please add it in Settings.");
         }
@@ -194,7 +190,7 @@ class TrackProcessor {
                 .then(resolve)
                 .catch(async (error) => {
                     console.error(`Lyrics transcription failed for ${track.fileName}:`, error);
-                    await AudioTrack.update(track.id, { status: "failed", errorMessage: error.message });
+                    await base44.entities.AudioTrack.update(track.id, { status: "failed", errorMessage: error.message });
                     reject(error);
                 })
                 .finally(() => {
@@ -206,13 +202,13 @@ class TrackProcessor {
     }
 
     async performLyricsTranscription(track, transcribeLyricsFn) {
-        const user = await User.me();
+        const user = await base44.auth.me();
         if (!user.gladiaToken) {
             console.warn("Gladia.io token not set, skipping lyrics transcription.");
             return; 
         }
         
-        await AudioTrack.update(track.id, { status: "transcribing", errorMessage: null });
+        await base44.entities.AudioTrack.update(track.id, { status: "transcribing", errorMessage: null });
         
         // Add retry logic for concurrent request limits
         let retries = 5;
@@ -222,7 +218,7 @@ class TrackProcessor {
             try {
                 const response = await transcribeLyricsFn({ audioUrl: track.fileUrl });
                 const lyrics = response.data;
-                await AudioTrack.update(track.id, { lyrics });
+                await base44.entities.AudioTrack.update(track.id, { lyrics });
                 console.log(`Lyrics transcription completed for: ${track.fileName}`);
                 return;
             } catch (error) {
@@ -263,7 +259,7 @@ class TrackProcessor {
         
         try {
             // Step 1: Upload to Cyanite and start analysis
-            await AudioTrack.update(track.id, { status: "analyzing", errorMessage: null });
+            await base44.entities.AudioTrack.update(track.id, { status: "analyzing", errorMessage: null });
 
             // Request upload URL
             const uploadRequest = await this.requestFileUpload();
@@ -281,7 +277,7 @@ class TrackProcessor {
             
             console.log('Library track created:', cyaniteTrackId);
 
-            await AudioTrack.update(track.id, { 
+            await base44.entities.AudioTrack.update(track.id, { 
                 cyaniteTrackId,
                 status: "analyzing"
             });
@@ -289,7 +285,7 @@ class TrackProcessor {
             return cyaniteTrackId;
         } catch (error) {
             console.error('Step 2 (Cyanite Upload) failed:', error);
-            await AudioTrack.update(track.id, { status: "failed", errorMessage: error.message });
+            await base44.entities.AudioTrack.update(track.id, { status: "failed", errorMessage: error.message });
             throw error;
         }
     }
@@ -299,7 +295,7 @@ class TrackProcessor {
         
         try {
             // Fetch the latest track data to get the cyaniteTrackId
-            const updatedTrackData = await AudioTrack.list();
+            const updatedTrackData = await base44.entities.AudioTrack.list();
             const currentTrack = updatedTrackData.find(t => t.id === track.id);
             
             if (!currentTrack || !currentTrack.cyaniteTrackId) {
@@ -325,7 +321,7 @@ class TrackProcessor {
                 
                 if (analysisStatus === "AudioAnalysisV7Finished") {
                     const rawMetadata = this.mapCyaniteResults(analysis.audioAnalysisV7.result);
-                    await AudioTrack.update(track.id, { 
+                    await base44.entities.AudioTrack.update(track.id, { 
                         rawMetadata,
                         status: "cleaning",
                         errorMessage: null
@@ -341,7 +337,7 @@ class TrackProcessor {
             throw new Error("Analysis timed out after 10 minutes");
         } catch (error) {
             console.error('Step 3 (Cyanite Analysis) failed:', error);
-            await AudioTrack.update(track.id, { status: "failed", errorMessage: error.message });
+            await base44.entities.AudioTrack.update(track.id, { status: "failed", errorMessage: error.message });
             throw error;
         }
     }
@@ -367,7 +363,7 @@ class TrackProcessor {
         
         try {
             // Fetch the latest track data to get the rawMetadata
-            const updatedTrackData = await AudioTrack.list();
+            const updatedTrackData = await base44.entities.AudioTrack.list();
             const currentTrack = updatedTrackData.find(t => t.id === track.id);
             
             if (!currentTrack || !currentTrack.rawMetadata) {
@@ -406,7 +402,7 @@ class TrackProcessor {
             // Use AI to enhance missing fields
             const enhancedMetadata = await this.enhanceMetadataWithAI(cleanedMetadata);
             
-            await AudioTrack.update(track.id, { 
+            await base44.entities.AudioTrack.update(track.id, { 
                 cleanedMetadata: enhancedMetadata,
                 status: "describing",
                 errorMessage: null
@@ -416,7 +412,7 @@ class TrackProcessor {
             return enhancedMetadata;
         } catch (error) {
             console.error('Step 4 (Clean) failed:', error);
-            await AudioTrack.update(track.id, { status: "failed", errorMessage: error.message });
+            await base44.entities.AudioTrack.update(track.id, { status: "failed", errorMessage: error.message });
             throw error;
         }
     }
@@ -452,7 +448,7 @@ class TrackProcessor {
         `;
 
         try {
-            const response = await InvokeLLM({
+            const response = await base44.integrations.Core.InvokeLLM({
                 prompt,
                 response_json_schema: {
                     type: "object",
@@ -479,7 +475,7 @@ class TrackProcessor {
         console.log(`Generating description for: ${track.fileName}`);
         
         try {
-            const updatedTrackData = await AudioTrack.list();
+            const updatedTrackData = await base44.entities.AudioTrack.list();
             const currentTrack = updatedTrackData.find(t => t.id === track.id);
             
             if (!currentTrack || !currentTrack.cleanedMetadata) {
@@ -487,7 +483,7 @@ class TrackProcessor {
             }
 
             const metadata = currentTrack.cleanedMetadata;
-            const tags = await Tag.list();
+            const tags = await base44.entities.Tag.list();
             const customTags = tags.map(t => t.tag);
 
             // Add lyrics to the prompt if they exist
@@ -515,14 +511,14 @@ class TrackProcessor {
                 Avoid generic phrases like "This track features..." or "This song is great for...". Do not list metadata. Think like a sync curator and music storyteller, painting a compelling, sync-driven picture that helps creatives imagine exactly where and how this song belongs on screen.
             `;
 
-            const description = await InvokeLLM({ prompt });
+            const description = await base44.integrations.Core.InvokeLLM({ prompt });
 
             const finalMetadata = {
                 ...metadata,
                 description: description.trim()
             };
 
-            await AudioTrack.update(track.id, { 
+            await base44.entities.AudioTrack.update(track.id, { 
                 finalMetadata,
                 status: "complete",
                 errorMessage: null
@@ -532,7 +528,7 @@ class TrackProcessor {
             return finalMetadata;
         } catch (error) {
             console.error('Step 5 (Describe) failed:', error);
-            await AudioTrack.update(track.id, { status: "failed", errorMessage: error.message });
+            await base44.entities.AudioTrack.update(track.id, { status: "failed", errorMessage: error.message });
             throw error;
         }
     }
