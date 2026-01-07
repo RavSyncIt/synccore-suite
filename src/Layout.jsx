@@ -31,7 +31,7 @@ export default function Layout({ children }) {
 
   return (
     <SidebarProvider>
-      <style jsx>{`
+      <style>{`
         :root {
           --syncit-bg: #E3DDDB;
           --syncit-orange: #F96F51;
