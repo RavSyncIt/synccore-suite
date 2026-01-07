@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { AudioTrack } from "@/entities/AudioTrack";
+import { base44 } from "@/api/base44Client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Upload, Music2, TrendingUp, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -21,7 +20,7 @@ export default function Dashboard() {
 
     const loadTracks = useCallback(async () => {
         try {
-            const trackData = await AudioTrack.list("-created_date");
+            const trackData = await base44.entities.AudioTrack.list("-created_date");
             setTracks(trackData);
             return trackData; // Return data for chaining
         } catch (error) {
@@ -41,9 +40,9 @@ export default function Dashboard() {
             if (!track.lyrics && track.status !== 'complete' && track.status !== 'error') {
                 try {
                     // Get latest track state
-                    track = await AudioTrack.get(track.id);
+                    track = await base44.entities.AudioTrack.get(track.id);
                     if (track.status !== 'transcribing') { // Only update status if not already in this state
-                        await AudioTrack.update(track.id, { status: "transcribing" });
+                        await base44.entities.AudioTrack.update(track.id, { status: "transcribing" });
                         await loadTracks();
                     }
                     
@@ -53,62 +52,62 @@ export default function Dashboard() {
                         await loadTracks();
                     } else {
                         console.warn('transcribeLyrics function not available, skipping lyrics transcription.');
-                        await AudioTrack.update(track.id, { status: "transcription_skipped" });
+                        await base44.entities.AudioTrack.update(track.id, { status: "transcription_skipped" });
                         await loadTracks();
                     }
                 } catch (error) {
                     console.warn(`Lyrics transcription failed for ${track.fileName}: ${error.message}. Marking as 'transcription_failed' and continuing.`);
-                    await AudioTrack.update(track.id, { status: "transcription_failed", errorMessage: `Lyrics transcription failed: ${error.message}` });
+                    await base44.entities.AudioTrack.update(track.id, { status: "transcription_failed", errorMessage: `Lyrics transcription failed: ${error.message}` });
                     await loadTracks();
                 }
             }
-            track = await AudioTrack.get(track.id); // Refresh track after potential lyrics step
+            track = await base44.entities.AudioTrack.get(track.id); // Refresh track after potential lyrics step
 
             // Step 2: Upload to Cyanite
             // Check if cyaniteTrackId is missing AND not complete/error
             if (!track.cyaniteTrackId && track.status !== 'complete' && track.status !== 'error') {
-                track = await AudioTrack.get(track.id); // Get latest track state
+                track = await base44.entities.AudioTrack.get(track.id); // Get latest track state
                 if (track.status !== 'uploading_to_cyanite') {
-                    await AudioTrack.update(track.id, { status: "uploading_to_cyanite" });
+                    await base44.entities.AudioTrack.update(track.id, { status: "uploading_to_cyanite" });
                     await loadTracks();
                 }
                 await trackProcessor.processTrackStep2_CyaniteUpload(track);
                 await loadTracks();
             }
-            track = await AudioTrack.get(track.id); // Refresh track after upload step
+            track = await base44.entities.AudioTrack.get(track.id); // Refresh track after upload step
 
             // Step 3: Wait for analysis and fetch results
             // Check if rawMetadata is missing AND not complete/error
             if (!track.rawMetadata && track.status !== 'complete' && track.status !== 'error') {
-                track = await AudioTrack.get(track.id); // Get latest track state
+                track = await base44.entities.AudioTrack.get(track.id); // Get latest track state
                 if (track.status !== 'analyzing') {
-                    await AudioTrack.update(track.id, { status: "analyzing" });
+                    await base44.entities.AudioTrack.update(track.id, { status: "analyzing" });
                     await loadTracks();
                 }
                 await trackProcessor.processTrackStep3_CyaniteAnalysis(track);
                 await loadTracks();
             }
-            track = await AudioTrack.get(track.id); // Refresh track after analysis step
+            track = await base44.entities.AudioTrack.get(track.id); // Refresh track after analysis step
             
             // Step 4: Clean and enhance metadata
             // Check if cleanedMetadata is missing AND not complete/error
             if (!track.cleanedMetadata && track.status !== 'complete' && track.status !== 'error') {
-                track = await AudioTrack.get(track.id); // Get latest track state
+                track = await base44.entities.AudioTrack.get(track.id); // Get latest track state
                 if (track.status !== 'cleaning_metadata') {
-                    await AudioTrack.update(track.id, { status: "cleaning_metadata" });
+                    await base44.entities.AudioTrack.update(track.id, { status: "cleaning_metadata" });
                     await loadTracks();
                 }
                 await trackProcessor.processTrackStep4_Clean(track);
                 await loadTracks();
             }
-            track = await AudioTrack.get(track.id); // Refresh track after cleaning step
+            track = await base44.entities.AudioTrack.get(track.id); // Refresh track after cleaning step
 
             // Step 5: Generate description
             // Check if status is not 'complete' AND not error
             if (track.status !== 'complete' && track.status !== 'error') {
-                track = await AudioTrack.get(track.id); // Get latest track state
+                track = await base44.entities.AudioTrack.get(track.id); // Get latest track state
                 if (track.status !== 'describing') {
-                    await AudioTrack.update(track.id, { status: "describing" });
+                    await base44.entities.AudioTrack.update(track.id, { status: "describing" });
                     await loadTracks();
                 }
                 await trackProcessor.processTrackStep5_Describe(track);
@@ -118,7 +117,7 @@ export default function Dashboard() {
             console.log(`Processing completed for: ${track.fileName}`);
         } catch (error) {
             console.error(`Processing error for ${track.fileName}:`, error);
-            await AudioTrack.update(initialTrack.id, { 
+            await base44.entities.AudioTrack.update(initialTrack.id, { 
                 status: "error",
                 errorMessage: error.message || String(error)
             });
@@ -163,7 +162,7 @@ export default function Dashboard() {
             setError(null);
             
             // Create track records
-            const newTrackRecords = await AudioTrack.bulkCreate(
+            const newTrackRecords = await base44.entities.AudioTrack.bulkCreate(
                 uploadedFiles.map(file => ({
                     fileName: file.fileName,
                     fileUrl: file.fileUrl,
@@ -206,7 +205,7 @@ export default function Dashboard() {
     const handleDeleteTrack = async (trackId) => {
         try {
             setError(null);
-            await AudioTrack.delete(trackId);
+            await base44.entities.AudioTrack.delete(trackId);
             await loadTracks();
             // If the deleted track was the one currently in the modal, close the modal
             if (selectedTrack && selectedTrack.id === trackId) {
