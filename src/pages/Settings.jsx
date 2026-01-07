@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from "react";
-import { User } from "@/entities/User";
+import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,7 +15,7 @@ export default function Settings() {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const user = await User.me();
+                const user = await base44.auth.me();
                 if (user) {
                     if (user.cyaniteToken) {
                         setCyaniteToken(user.cyaniteToken);
@@ -35,7 +34,7 @@ export default function Settings() {
     const handleSave = async () => {
         setIsLoading(true);
         try {
-            await User.updateMyUserData({ cyaniteToken, gladiaToken });
+            await base44.auth.updateMe({ cyaniteToken, gladiaToken });
             toast.success("Settings saved successfully!");
         } catch (error) {
             console.error("Failed to save settings:", error);
