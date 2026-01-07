@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, Search, UserPlus, CheckCircle, XCircle } from 'lucide-react';
 import { toast } from 'sonner';
-import { MusicSupervisor } from '@/entities/MusicSupervisor';
+import { base44 } from '@/api/base44Client';
 
 import ContactSearchForm from '../components/contact/ContactSearchForm';
 import ContactCard from '../components/contact/ContactCard';
