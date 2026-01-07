@@ -23,7 +23,7 @@ export default function SyncContactPage() {
 
     const loadContacts = async () => {
         try {
-            const data = await MusicSupervisor.list('-created_date');
+            const data = await base44.entities.MusicSupervisor.list('-created_date');
             setContacts(data);
         } catch (error) {
             console.error('Failed to load contacts:', error);
@@ -34,7 +34,7 @@ export default function SyncContactPage() {
 
     const handleSearchComplete = async (contactData) => {
         try {
-            await MusicSupervisor.create(contactData);
+            await base44.entities.MusicSupervisor.create(contactData);
             await loadContacts();
         } catch (error) {
             console.error('Failed to save contact:', error);
@@ -48,7 +48,7 @@ export default function SyncContactPage() {
 
     const handleSaveEdit = async (updatedData) => {
         try {
-            await MusicSupervisor.update(editingContact.id, updatedData);
+            await base44.entities.MusicSupervisor.update(editingContact.id, updatedData);
             await loadContacts();
             setEditingContact(null);
             toast.success('Contact updated successfully!');
@@ -62,7 +62,7 @@ export default function SyncContactPage() {
         if (!confirm('Are you sure you want to delete this contact?')) return;
         
         try {
-            await MusicSupervisor.delete(contactId);
+            await base44.entities.MusicSupervisor.delete(contactId);
             await loadContacts();
             toast.success('Contact deleted successfully!');
         } catch (error) {
@@ -73,7 +73,7 @@ export default function SyncContactPage() {
 
     const handleToggleVerified = async (contact) => {
         try {
-            await MusicSupervisor.update(contact.id, { ...contact, verified: !contact.verified });
+            await base44.entities.MusicSupervisor.update(contact.id, { ...contact, verified: !contact.verified });
             await loadContacts();
             toast.success(`Contact marked as ${!contact.verified ? 'verified' : 'unverified'}`);
         } catch (error) {
