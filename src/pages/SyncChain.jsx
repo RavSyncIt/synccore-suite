@@ -58,8 +58,7 @@ export default function SyncChainPage() {
 
         const setupSubscription = async () => {
             try {
-                const { agentSDK } = await import('@/agents');
-                const unsubscribe = agentSDK.subscribeToConversation(activeConversationId, async (data) => {
+                const unsubscribe = base44.agents.subscribeToConversation(activeConversationId, async (data) => {
                     if (data.status !== 'running' && data.status !== 'pending') {
                         setIsSearching(false);
                         setActiveConversationId(null);
@@ -148,8 +147,7 @@ export default function SyncChainPage() {
             await loadSearches(); // Refresh the list to show the new "searching" item
 
             // Now create a fresh conversation for this search
-            const { agentSDK } = await import('@/agents');
-            const newConversation = await agentSDK.createConversation({
+            const newConversation = await base44.agents.createConversation({
                 agent_name: AGENT_NAME,
                 metadata: { name: `SyncChain: ${query.title || query.isrc}` }
             });
@@ -163,7 +161,7 @@ export default function SyncChainPage() {
                 DSP URL: ${query.url || 'N/A'}
             `;
             
-            await agentSDK.addMessage(newConversation, { role: 'user', content: prompt });
+            await base44.agents.addMessage(newConversation, { role: 'user', content: prompt });
         } catch (error) {
             console.error("Failed to start search:", error);
             setAgentError("Failed to communicate with the AI assistant.");
