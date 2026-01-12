@@ -1,10 +1,8 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { SyncChainSearch } from '@/entities/SyncChainSearch';
-import { AudioTrack } from '@/entities/AudioTrack';
+import { base44 } from '@/api/base44Client';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 import SearchForm from '../components/chain/SearchForm';
@@ -25,7 +23,7 @@ export default function SyncChainPage() {
 
     const loadSearches = useCallback(async () => {
         try {
-            const searches = await SyncChainSearch.list('-created_date');
+            const searches = await base44.entities.SyncChainSearch.list('-created_date');
             setSearches(searches);
             const runningSearch = searches.find(s => s.status === 'searching');
             if (runningSearch) {
@@ -41,7 +39,7 @@ export default function SyncChainPage() {
 
     const loadSyncPulseTracks = useCallback(async () => {
         try {
-            const tracks = await AudioTrack.filter({ status: 'complete' }, '-created_date');
+            const tracks = await base44.entities.AudioTrack.filter({ status: 'complete' }, '-created_date');
             setSyncPulseTracks(tracks);
         } catch (error) {
             console.error("Failed to load SyncPulse tracks:", error);
@@ -60,8 +58,7 @@ export default function SyncChainPage() {
 
         const setupSubscription = async () => {
             try {
-                const { agentSDK } = await import('@/agents');
-                const unsubscribe = agentSDK.subscribeToConversation(activeConversationId, async (data) => {
+                const unsubscribe = base44.agents.subscribeToConversation(activeConversationId, async (data) => {
                     if (data.status !== 'running' && data.status !== 'pending') {
                         setIsSearching(false);
                         setActiveConversationId(null);
@@ -84,7 +81,7 @@ export default function SyncChainPage() {
                                     }
                                 }
 
-                                await SyncChainSearch.update(runningSearch.id, {
+                                await base44.entities.SyncChainSearch.update(runningSearch.id, {
                                     resultsMarkdown: lastMessage.content,
                                     status: 'completed',
                                     trackTitle,
@@ -138,7 +135,7 @@ export default function SyncChainPage() {
 
         try {
             // Create a new placeholder search record first
-            await SyncChainSearch.create({
+            await base44.entities.SyncChainSearch.create({
                 queryTitle: query.title,
                 queryArtist: query.artist,
                 queryIsrc: query.isrc,
@@ -150,8 +147,7 @@ export default function SyncChainPage() {
             await loadSearches(); // Refresh the list to show the new "searching" item
 
             // Now create a fresh conversation for this search
-            const { agentSDK } = await import('@/agents');
-            const newConversation = await agentSDK.createConversation({
+            const newConversation = await base44.agents.createConversation({
                 agent_name: AGENT_NAME,
                 metadata: { name: `SyncChain: ${query.title || query.isrc}` }
             });
@@ -165,7 +161,7 @@ export default function SyncChainPage() {
                 DSP URL: ${query.url || 'N/A'}
             `;
             
-            await agentSDK.addMessage(newConversation, { role: 'user', content: prompt });
+            await base44.agents.addMessage(newConversation, { role: 'user', content: prompt });
         } catch (error) {
             console.error("Failed to start search:", error);
             setAgentError("Failed to communicate with the AI assistant.");
@@ -175,7 +171,7 @@ export default function SyncChainPage() {
 
     const handleDeleteSearch = async (searchId) => {
         try {
-            await SyncChainSearch.delete(searchId);
+            await base44.entities.SyncChainSearch.delete(searchId);
             await loadSearches();
             toast.success("Search removed from history.");
         } catch (error) {

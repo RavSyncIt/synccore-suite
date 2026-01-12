@@ -1,23 +1,23 @@
 import Dashboard from './pages/Dashboard';
-import TagBank from './pages/TagBank';
-import Settings from './pages/Settings';
-import Search from './pages/Search';
 import DealBuilder from './pages/DealBuilder';
-import SyncRadar from './pages/SyncRadar';
+import Search from './pages/Search';
+import Settings from './pages/Settings';
 import SyncChain from './pages/SyncChain';
 import SyncContact from './pages/SyncContact';
+import SyncRadar from './pages/SyncRadar';
+import TagBank from './pages/TagBank';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
     "Dashboard": Dashboard,
-    "TagBank": TagBank,
-    "Settings": Settings,
-    "Search": Search,
     "DealBuilder": DealBuilder,
-    "SyncRadar": SyncRadar,
+    "Search": Search,
+    "Settings": Settings,
     "SyncChain": SyncChain,
     "SyncContact": SyncContact,
+    "SyncRadar": SyncRadar,
+    "TagBank": TagBank,
 }
 
 export const pagesConfig = {
