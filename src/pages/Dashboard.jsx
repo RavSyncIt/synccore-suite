@@ -46,15 +46,11 @@ export default function Dashboard() {
                         await loadTracks();
                     }
                     
-                    const { transcribeLyrics } = await import("@/functions/transcribeLyrics");
-                    if (typeof transcribeLyrics === 'function') {
-                        await trackProcessor.processTrackStep1_Lyrics(track, transcribeLyrics);
-                        await loadTracks();
-                    } else {
-                        console.warn('transcribeLyrics function not available, skipping lyrics transcription.');
-                        await base44.entities.AudioTrack.update(track.id, { status: "transcription_skipped" });
-                        await loadTracks();
-                    }
+                    const transcribeLyrics = async (payload) => {
+                        return await base44.functions.invoke('transcribeLyrics', payload);
+                    };
+                    await trackProcessor.processTrackStep1_Lyrics(track, transcribeLyrics);
+                    await loadTracks();
                 } catch (error) {
                     console.warn(`Lyrics transcription failed for ${track.fileName}: ${error.message}. Marking as 'transcription_failed' and continuing.`);
                     await base44.entities.AudioTrack.update(track.id, { status: "transcription_failed", errorMessage: `Lyrics transcription failed: ${error.message}` });
