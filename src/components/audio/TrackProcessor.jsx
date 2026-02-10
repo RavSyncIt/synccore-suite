@@ -239,19 +239,25 @@ class TrackProcessor {
     }
 
     async processTrackStep1_Lyrics(track, transcribeLyricsFn) {
-        console.log(`Queueing lyrics transcription for: ${track.fileName}`);
+        console.log(`Starting lyrics transcription for: ${track.fileName}`);
         
-        return new Promise((resolve, reject) => {
-            this.lyricsQueue.push({
-                track,
-                transcribeLyricsFn,
-                resolve,
-                reject
-            });
-            
-            // Start processing the queue
-            this.processLyricsQueue();
-        });
+        const user = await base44.auth.me();
+        if (!user.gladiaToken) {
+            console.warn("Gladia.io token not set, skipping lyrics transcription.");
+            return; 
+        }
+        
+        await base44.entities.AudioTrack.update(track.id, { status: "transcribing", errorMessage: null });
+        
+        try {
+            const response = await transcribeLyricsFn({ audioUrl: track.fileUrl });
+            const lyrics = response.data;
+            await base44.entities.AudioTrack.update(track.id, { lyrics });
+            console.log(`Lyrics transcription completed for: ${track.fileName}`);
+        } catch (error) {
+            console.error(`Lyrics transcription failed for ${track.fileName}:`, error);
+            throw error;
+        }
     }
 
     async processTrackStep2_CyaniteUpload(track) {
