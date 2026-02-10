@@ -1,4 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.7.1';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.6';
 
 export async function transcribeLyrics({ audioUrl }) {
     // This is a wrapper function that can be called from the frontend
