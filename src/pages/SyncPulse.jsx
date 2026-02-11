@@ -11,7 +11,7 @@ import TrackProcessor from "../components/audio/TrackProcessor";
 import TrackDetailsModal from "../components/audio/TrackDetailsModal";
 import TrackEditModal from "../components/audio/TrackEditModal";
 
-export default function Dashboard() {
+export default function SyncPulse() {
     const [tracks, setTracks] = useState([]);
     const [error, setError] = useState(null);
     const [selectedTrack, setSelectedTrack] = useState(null);

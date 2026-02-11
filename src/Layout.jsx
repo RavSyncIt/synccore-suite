@@ -17,7 +17,7 @@ import {
 
 const navigationItems = [
   { title: "SyncVisor", url: createPageUrl("Search"), icon: Search },
-  { title: "SyncPulse", url: createPageUrl("Dashboard"), icon: Music },
+  { title: "SyncPulse", url: createPageUrl("SyncPulse"), icon: Music },
   { title: "SyncRadar", url: createPageUrl("SyncRadar"), icon: Tags },
   { title: "SyncDex", url: createPageUrl("TagBank"), icon: Database },
   { title: "SyncClause", url: createPageUrl("DealBuilder"), icon: FileText },
