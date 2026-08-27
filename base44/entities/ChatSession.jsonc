@@ -1,0 +1,41 @@
+{
+  "name": "ChatSession",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "User-defined name for the chat session"
+    },
+    "conversationId": {
+      "type": "string",
+      "description": "The agent conversation ID"
+    },
+    "messages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Chat messages in the session"
+    },
+    "lastMessage": {
+      "type": "string",
+      "description": "Preview of the last message"
+    }
+  },
+  "required": [
+    "name",
+    "conversationId",
+    "messages"
+  ]
+}

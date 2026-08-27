@@ -1,0 +1,241 @@
+{
+  "name": "SyncOpportunity",
+  "type": "object",
+  "properties": {
+    "source": {
+      "type": "object",
+      "properties": {
+        "platform": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "postedAt": {
+          "type": "string"
+        },
+        "author": {
+          "type": "string"
+        },
+        "authorUrl": {
+          "type": "string"
+        },
+        "orgName": {
+          "type": "string"
+        },
+        "orgUrl": {
+          "type": "string"
+        },
+        "orgDomain": {
+          "type": "string"
+        }
+      }
+    },
+    "brief": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "media": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "territories": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "term": {
+          "type": "string"
+        },
+        "budgetMin": {
+          "type": "number"
+        },
+        "budgetMax": {
+          "type": "number"
+        },
+        "currency": {
+          "type": "string",
+          "enum": [
+            "GBP",
+            "USD",
+            "EUR",
+            "UNKNOWN"
+          ]
+        },
+        "exclusivity": {
+          "type": "string",
+          "enum": [
+            "none",
+            "category",
+            "market",
+            "full"
+          ]
+        },
+        "deadline": {
+          "type": "string"
+        },
+        "deliverables": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "keywords": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "contact": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "submissionUrl": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "meta": {
+      "type": "object",
+      "properties": {
+        "language": {
+          "type": "string",
+          "default": "en"
+        },
+        "rawText": {
+          "type": "string"
+        },
+        "hashtags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "mentions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "attachments": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "detectedEmails": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "detectedLinks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "trust": {
+      "type": "object",
+      "properties": {
+        "score": {
+          "type": "number"
+        },
+        "decision": {
+          "type": "string",
+          "enum": [
+            "green",
+            "amber",
+            "red"
+          ]
+        },
+        "signals": {
+          "type": "object",
+          "properties": {
+            "companyRegistryMatch": {
+              "type": "boolean"
+            },
+            "orgDomainAgeDays": {
+              "type": "number"
+            },
+            "orgHasLinkedinOrCompanyPage": {
+              "type": "boolean"
+            },
+            "contactEmailDomainMatchesOrg": {
+              "type": "boolean"
+            },
+            "budgetPresent": {
+              "type": "boolean"
+            },
+            "specificityScore": {
+              "type": "number"
+            },
+            "govOrEduTender": {
+              "type": "boolean"
+            },
+            "knownSupervisorOrAgency": {
+              "type": "boolean"
+            },
+            "scamPhrases": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "new",
+        "contacted",
+        "pitched",
+        "won",
+        "lost",
+        "archived"
+      ],
+      "default": "new"
+    },
+    "dedupKey": {
+      "type": "string",
+      "description": "Unique key for deduplication"
+    }
+  },
+  "required": [
+    "source",
+    "brief",
+    "trust",
+    "dedupKey"
+  ]
+}

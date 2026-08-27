@@ -1,0 +1,17 @@
+{
+  "name": "User",
+  "type": "object",
+  "properties": {
+    "cyaniteToken": {
+      "type": "string",
+      "description": "User's Cyanite API Token"
+    },
+    "gladiaToken": {
+      "type": "string",
+      "description": "User's Gladia.io API Key for lyrics"
+    }
+  },
+  "required": [
+    "cyaniteToken"
+  ]
+}

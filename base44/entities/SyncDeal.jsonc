@@ -1,0 +1,47 @@
+{
+  "name": "SyncDeal",
+  "type": "object",
+  "properties": {
+    "projectTitle": {
+      "type": "string"
+    },
+    "licenseeName": {
+      "type": "string"
+    },
+    "trackTitle": {
+      "type": "string"
+    },
+    "trackArtist": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "completed",
+        "archived"
+      ],
+      "default": "draft"
+    },
+    "termsJson": {
+      "type": "object",
+      "properties": {}
+    },
+    "termSheet": {
+      "type": "string"
+    },
+    "agreement": {
+      "type": "string"
+    },
+    "assumptions": {
+      "type": "string"
+    },
+    "risks": {
+      "type": "string"
+    },
+    "brief": {
+      "type": "string"
+    }
+  },
+  "required": []
+}

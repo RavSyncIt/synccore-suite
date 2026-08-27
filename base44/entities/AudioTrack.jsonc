@@ -1,0 +1,57 @@
+{
+  "name": "AudioTrack",
+  "type": "object",
+  "properties": {
+    "fileName": {
+      "type": "string"
+    },
+    "artist": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "uploading",
+        "transcribing",
+        "transcription_failed",
+        "transcription_skipped",
+        "uploading_to_cyanite",
+        "analyzing",
+        "cleaning_metadata",
+        "describing",
+        "complete",
+        "error"
+      ],
+      "default": "uploading"
+    },
+    "cyaniteTrackId": {
+      "type": "string"
+    },
+    "fileUrl": {
+      "type": "string"
+    },
+    "rawMetadata": {
+      "type": "object",
+      "properties": {}
+    },
+    "cleanedMetadata": {
+      "type": "object",
+      "properties": {}
+    },
+    "finalMetadata": {
+      "type": "object",
+      "properties": {}
+    },
+    "lyrics": {
+      "type": "string",
+      "description": "Transcribed lyrics of the song"
+    },
+    "errorMessage": {
+      "type": "string"
+    }
+  },
+  "required": []
+}

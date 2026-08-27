@@ -1,0 +1,65 @@
+{
+  "name": "MusicSupervisor",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Full name of the music supervisor"
+    },
+    "company": {
+      "type": "string",
+      "description": "Current company or production"
+    },
+    "email": {
+      "type": "string",
+      "description": "Contact email address"
+    },
+    "phone": {
+      "type": "string",
+      "description": "Contact phone number"
+    },
+    "linkedinUrl": {
+      "type": "string",
+      "description": "LinkedIn profile URL"
+    },
+    "imdbUrl": {
+      "type": "string",
+      "description": "IMDB profile URL"
+    },
+    "website": {
+      "type": "string",
+      "description": "Personal or company website"
+    },
+    "credits": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Notable projects or credits"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional notes or context"
+    },
+    "verified": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether contact details have been verified"
+    },
+    "lastContacted": {
+      "type": "string",
+      "format": "date",
+      "description": "Last contact date"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Tags for categorization (Film, TV, Gaming, etc.)"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

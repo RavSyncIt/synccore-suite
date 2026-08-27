@@ -1,0 +1,16 @@
+{
+  "name": "Tag",
+  "type": "object",
+  "properties": {
+    "tag": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string",
+      "description": "e.g., Moods, Genres, Instruments"
+    }
+  },
+  "required": [
+    "tag"
+  ]
+}

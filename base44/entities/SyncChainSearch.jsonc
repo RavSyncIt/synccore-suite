@@ -1,0 +1,199 @@
+{
+  "name": "SyncChainSearch",
+  "type": "object",
+  "properties": {
+    "queryTitle": {
+      "type": "string"
+    },
+    "queryArtist": {
+      "type": "string"
+    },
+    "queryIsrc": {
+      "type": "string"
+    },
+    "queryUrl": {
+      "type": "string"
+    },
+    "queryType": {
+      "type": "string",
+      "enum": [
+        "isrc",
+        "spotify_url",
+        "title_artist",
+        "manual"
+      ],
+      "default": "title_artist"
+    },
+    "normalized": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "artist": {
+          "type": "string"
+        },
+        "isrc": {
+          "type": "string"
+        },
+        "fingerprint": {
+          "type": "string"
+        }
+      }
+    },
+    "trackTitle": {
+      "type": "string"
+    },
+    "trackArtist": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "queued",
+        "searching",
+        "partial",
+        "completed",
+        "failed"
+      ],
+      "default": "queued"
+    },
+    "resultsMarkdown": {
+      "type": "string"
+    },
+    "resultsJson": {
+      "type": "object",
+      "description": "Structured resolver output used by the UI + exports."
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "field": {
+            "type": "string"
+          },
+          "value": {},
+          "source": {
+            "type": "string"
+          },
+          "sourceId": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "retrievedAt": {
+            "type": "string"
+          },
+          "confidence": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "confidence": {
+      "type": "object",
+      "properties": {
+        "overall": {
+          "type": "number"
+        },
+        "recording": {
+          "type": "number"
+        },
+        "publishing": {
+          "type": "number"
+        }
+      }
+    },
+    "match": {
+      "type": "object",
+      "properties": {
+        "recordingCandidates": {
+          "type": "array"
+        },
+        "workCandidates": {
+          "type": "array"
+        },
+        "chosenRecordingId": {
+          "type": "string"
+        },
+        "chosenWorkId": {
+          "type": "string"
+        },
+        "matchReasons": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "sourcesTried": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "failed",
+              "skipped",
+              "timeout"
+            ]
+          },
+          "latencyMs": {
+            "type": "number"
+          },
+          "error": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "timing": {
+      "type": "object",
+      "properties": {
+        "startedAt": {
+          "type": "string"
+        },
+        "completedAt": {
+          "type": "string"
+        },
+        "totalMs": {
+          "type": "number"
+        }
+      }
+    },
+    "cache": {
+      "type": "object",
+      "properties": {
+        "cacheHit": {
+          "type": "boolean"
+        },
+        "cacheKey": {
+          "type": "string"
+        }
+      }
+    },
+    "batch": {
+      "type": "object",
+      "properties": {
+        "batchId": {
+          "type": "string"
+        },
+        "rowIndex": {
+          "type": "number"
+        },
+        "inputRow": {
+          "type": "object"
+        }
+      }
+    }
+  },
+  "required": []
+}
